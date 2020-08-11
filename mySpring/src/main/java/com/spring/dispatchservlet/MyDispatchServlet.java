@@ -4,8 +4,6 @@ import com.spring.annotation.MyAutowired;
 import com.spring.annotation.MyController;
 import com.spring.annotation.MyRequestMapping;
 import com.spring.annotation.MyService;
-import com.sun.jndi.toolkit.url.Uri;
-import netscape.javascript.JSObject;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
