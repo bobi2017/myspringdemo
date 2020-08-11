@@ -163,7 +163,6 @@ public class MyDispatchServlet extends HttpServlet {
                 }
                 if (iocMap.get(beanName) == null) {
                     iocMap.put(beanName,clazz.newInstance());
-                    // getInterfaces 此方法返回这个类中实现接口的数组
                     for (Class<?> i : clazz.getInterfaces()) {
                         if (iocMap.containsKey(i.getName())) {
                             throw new Exception("The Bean Name Is Exist.");
