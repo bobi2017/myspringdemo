@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author yaodong.zhai
+ * 提供自动注入
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

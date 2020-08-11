@@ -42,7 +42,7 @@ public class MyDispatchServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)  {
         try {
             dispatch(req, resp);
         } catch (Exception ex) {
@@ -75,9 +75,9 @@ public class MyDispatchServlet extends HttpServlet {
             doScanner(contextConfig.getProperty("scan-package"));
             //第三步初始化ioc
             initIoc();
-            //依赖注入
+            //第四步依赖注入
             initDi();
-            //初始化HandlerMapping
+            //第五步初始化HandlerMapping
             initHandlerMapping();
             System.out.println("初始化spring容器完成");
         } catch (Exception e) {
@@ -179,6 +179,9 @@ public class MyDispatchServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 初始化依赖注入
+     */
     private void initDi() {
         if (iocMap.isEmpty()) {
             return;
@@ -209,6 +212,9 @@ public class MyDispatchServlet extends HttpServlet {
         }
     }
 
+    /**
+     * 初始化访问上下文
+     */
     private void initHandlerMapping() {
         for (Map.Entry<String, Object> entry : iocMap.entrySet()) {
             Class<?> clazz = entry.getValue().getClass();

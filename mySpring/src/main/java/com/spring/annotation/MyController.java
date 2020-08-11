@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author yaodong.zhai
+ * 提供controller注解
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

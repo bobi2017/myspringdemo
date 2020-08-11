@@ -1,6 +1,14 @@
 package com.spring.service;
 
-public interface TestService {
+import com.spring.annotation.MyService;
 
-     String test();
+/**
+ * @author yaodong.zhai
+ */
+@MyService
+public class TestService {
+
+    public String test(){
+        return "success";
+    }
 }
