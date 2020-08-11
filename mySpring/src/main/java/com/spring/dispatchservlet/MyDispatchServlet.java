@@ -23,17 +23,25 @@ import java.util.*;
  * @author yaodong.zhai
  */
 public class MyDispatchServlet extends HttpServlet {
-
+    /**
+     * 配置信息
+     */
     private Properties contextConfig = new Properties();
-
+    /**
+     * 扫描到的class信息
+     */
     private List<String> classNameList = new ArrayList();
-
+    /**
+     * ioc容器
+     */
     private Map<String, Object> iocMap = new HashMap();
-
+    /**
+     * url映射关系
+     */
     private Map<String, Method> handlerMappingMap = new HashMap();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         this.doPost(req, resp);
     }
 
@@ -55,9 +63,7 @@ public class MyDispatchServlet extends HttpServlet {
             resp.getWriter().write("404 NOT FOUND");
             return;
         }
-        Map<String, String[]> map = req.getParameterMap();
         String beanName = getBeanName(method.getDeclaringClass().getSimpleName());
-        method.setAccessible(true);
         Object object = handlerMappingMap.get(url).invoke(iocMap.get(beanName), req, resp);
         resp.getWriter().write(object.toString());
     }
@@ -148,7 +154,7 @@ public class MyDispatchServlet extends HttpServlet {
                     beanName = annotationMyController.value();
                 }
                 if (iocMap.get(beanName) == null) {
-                    iocMap.put(beanName, clazz.newInstance());
+                    iocMap.put(beanName, clazz.getDeclaredConstructor().newInstance());
                 } else {
                     throw new Exception("配置的Controller已经存在");
                 }
@@ -160,14 +166,7 @@ public class MyDispatchServlet extends HttpServlet {
                     beanName = annotationMyService.value();
                 }
                 if (iocMap.get(beanName) == null) {
-                    iocMap.put(beanName, clazz.newInstance());
-                    for (Class<?> i : clazz.getInterfaces()) {
-                        if (iocMap.containsKey(i.getName())) {
-                            throw new Exception("The Bean Name Is Exist.");
-                        }
-                        // 接口不能实例化，接口存实现类的实例
-                        iocMap.put(i.getName(), clazz.newInstance());
-                    }
+                    iocMap.put(beanName, clazz.getDeclaredConstructor().newInstance());
                 } else {
                     throw new Exception("配置的Service Bean已经存在");
                 }
@@ -196,7 +195,7 @@ public class MyDispatchServlet extends HttpServlet {
                 MyAutowired myAutowired = field.getAnnotation(MyAutowired.class);
                 String beanName = myAutowired.value().trim();
                 if ("".equals(beanName)) {
-                    beanName = field.getType().getName();
+                    beanName = getBeanName(field.getType().getSimpleName());
                 }
                 //private 访问
                 field.setAccessible(true);
