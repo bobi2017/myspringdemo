@@ -28,9 +28,9 @@ public class MyDispatchServlet extends HttpServlet {
 
     private List<String> classNameList = new ArrayList();
 
-    private Map<String,Object> iocMap = new HashMap();
+    private Map<String, Object> iocMap = new HashMap();
 
-    private Map<String,Method> handlerMappingMap = new HashMap();
+    private Map<String, Method> handlerMappingMap = new HashMap();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -38,7 +38,7 @@ public class MyDispatchServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)  {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             dispatch(req, resp);
         } catch (Exception ex) {
@@ -49,16 +49,16 @@ public class MyDispatchServlet extends HttpServlet {
     public void dispatch(HttpServletRequest req, HttpServletResponse resp) throws IOException, InvocationTargetException, IllegalAccessException {
         String url = req.getRequestURI();
         String contextPath = req.getContextPath();
-        url = url.replace(contextPath,"").replaceAll("/+","/");
+        url = url.replace(contextPath, "").replaceAll("/+", "/");
         Method method = this.handlerMappingMap.get(url);
         if (method == null) {
             resp.getWriter().write("404 NOT FOUND");
             return;
         }
-        Map<String,String[]> map = req.getParameterMap();
+        Map<String, String[]> map = req.getParameterMap();
         String beanName = getBeanName(method.getDeclaringClass().getSimpleName());
         method.setAccessible(true);
-        Object object = handlerMappingMap.get(url).invoke(iocMap.get(beanName),req,resp);
+        Object object = handlerMappingMap.get(url).invoke(iocMap.get(beanName), req, resp);
         resp.getWriter().write(object.toString());
     }
 
@@ -85,9 +85,10 @@ public class MyDispatchServlet extends HttpServlet {
 
     /**
      * 加载配置
+     *
      * @param servletConfig
      */
-    private void doLoadConfig(String servletConfig){
+    private void doLoadConfig(String servletConfig) {
         InputStream io = this.getClass().getClassLoader().getResourceAsStream(servletConfig);
         try {
             contextConfig.load(io);
@@ -106,6 +107,7 @@ public class MyDispatchServlet extends HttpServlet {
 
     /**
      * 扫描相关类
+     *
      * @param scanPackage
      */
     private void doScanner(String scanPackage) {
@@ -121,7 +123,7 @@ public class MyDispatchServlet extends HttpServlet {
                 if (!file.getName().endsWith("class")) {
                     continue;
                 } else {
-                    String className = scanPackage + "." + file.getName().replace(".class","");
+                    String className = scanPackage + "." + file.getName().replace(".class", "");
                     classNameList.add(className);
                 }
             }
@@ -131,34 +133,34 @@ public class MyDispatchServlet extends HttpServlet {
     /**
      * 初始化IOC容器
      */
-    private void initIoc() throws Exception{
+    private void initIoc() throws Exception {
         if (classNameList.size() == 0) {
             return;
         }
-        for (String classPath :classNameList) {
+        for (String classPath : classNameList) {
             Class clazz = Class.forName(classPath);
-            String beanName ="";
+            String beanName = "";
             if (clazz.isAnnotationPresent(MyController.class)) {
-                MyController annotationMyController = (MyController)clazz.getAnnotation(MyController.class);
+                MyController annotationMyController = (MyController) clazz.getAnnotation(MyController.class);
                 if ("".equals(annotationMyController.value())) {
                     beanName = getBeanName(clazz.getSimpleName());
                 } else {
                     beanName = annotationMyController.value();
                 }
                 if (iocMap.get(beanName) == null) {
-                    iocMap.put(beanName,clazz.newInstance());
+                    iocMap.put(beanName, clazz.newInstance());
                 } else {
                     throw new Exception("配置的Controller已经存在");
                 }
             } else if (clazz.isAnnotationPresent(MyService.class)) {
-                MyService annotationMyService = (MyService)clazz.getAnnotation(MyService.class);
+                MyService annotationMyService = (MyService) clazz.getAnnotation(MyService.class);
                 if (("".equals(annotationMyService.value()))) {
-                   beanName = getBeanName(clazz.getSimpleName());
+                    beanName = getBeanName(clazz.getSimpleName());
                 } else {
                     beanName = annotationMyService.value();
                 }
                 if (iocMap.get(beanName) == null) {
-                    iocMap.put(beanName,clazz.newInstance());
+                    iocMap.put(beanName, clazz.newInstance());
                     for (Class<?> i : clazz.getInterfaces()) {
                         if (iocMap.containsKey(i.getName())) {
                             throw new Exception("The Bean Name Is Exist.");
@@ -199,7 +201,7 @@ public class MyDispatchServlet extends HttpServlet {
                 //private 访问
                 field.setAccessible(true);
                 try {
-                    field.set(value,iocMap.get(beanName));
+                    field.set(value, iocMap.get(beanName));
                 } catch (IllegalAccessException ex) {
                     ex.printStackTrace();
                 }
@@ -233,8 +235,8 @@ public class MyDispatchServlet extends HttpServlet {
     }
 
     private String getBeanName(String className) {
-            char[] charArray = className.toCharArray();
-            charArray[0] += 32;
-            return String.valueOf(charArray);
+        char[] charArray = className.toCharArray();
+        charArray[0] += 32;
+        return String.valueOf(charArray);
     }
 }

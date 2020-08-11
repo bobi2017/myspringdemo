@@ -8,7 +8,7 @@ import com.spring.annotation.MyService;
 @MyService
 public class TestService {
 
-    public String test(){
+    public String test() {
         return "success";
     }
 }
